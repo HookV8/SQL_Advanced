@@ -83,17 +83,18 @@ SELECT artist_name, playback_time
  		  FROM tracks)
 
 /*название альбомов, содержащих наименьшее количество треков*/						  
-SELECT DISTINCT album_name 
-  FROM albums a 
-       LEFT JOIN tracks t ON t.album_id = a.album_id 
- WHERE t.album_id IN
- 	   (SELECT album_id FROM tracks  
-    	 GROUP BY album_id 
-    		   HAVING count(album_id) = 
-	    		      (SELECT count(track_id)
-	         		     FROM tracks  
-	          		    GROUP BY album_id 
-	         		    ORDER BY count
-	         		    LIMIT 1))					
+SELECT albums.album_name, count(tracks.track_id) track_count
+  FROM albums 
+       JOIN tracks 
+	   ON tracks.album_id = albums.album_id 
+ GROUP BY albums.album_name 
+ 	   HAVING count(tracks.track_id)  = 
+	   		  (SELECT count(tracks.track_id) track_count
+  				 FROM albums 
+       			      JOIN tracks 
+				      ON tracks.album_id = albums.album_id
+       			GROUP BY albums.album_name 
+       			ORDER BY count(tracks.track_id) 
+ 				LIMIT 1);					
 
 
